@@ -6,3 +6,5 @@
 /yarn.lock
 node_modules
 package-lock.json
+dirty-bot/
+*.out
