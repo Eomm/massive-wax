@@ -14,12 +14,34 @@ module.exports = function waxOn (options) {
     updateSourceCode
   }
 
-  function updateSourceCode (directory, onFile) {
+  function updateSourceCode (directory, onFile, onComplete) {
     console.log('walking', directory)
-    for (const file of walkSync(directory, fileFilter)) {
-      // TODO pipeline
-      const out = onFile(file)
-      // TODO if promise
+
+    const iter = walkSync(directory, fileFilter)
+    const goNext = () => { next(iter.next().value) }
+
+    if (!onComplete) {
+      return new Promise((resolve, reject) => {
+        onComplete = resolve
+        goNext()
+      })
+    } else {
+      goNext()
+    }
+
+    function next (value) {
+      if (!value) {
+        if (onComplete) {
+          onComplete()
+        }
+        return
+      }
+      const out = onFile(value)
+      if (out && typeof out.then === 'function') {
+        out.then(goNext).catch(goNext)
+        return
+      }
+      goNext()
     }
   }
 }

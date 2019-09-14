@@ -1,7 +1,6 @@
 'use strict'
 
 const Octokit = require('@octokit/rest')
-const { spawn } = require('child_process')
 const { promisify } = require('util')
 
 const setTime = promisify(setTimeout)
@@ -20,20 +19,15 @@ module.exports = function build (authConfig) {
       // TODO manage response
       return waitFork(resp.data)
     },
-    async clone (gitUrl, to) {
-      console.log('clone', gitUrl, to)
-      return new Promise((resolve, reject) => {
-        const gitCommand = spawn('git', ['clone', gitUrl, to])
-        gitCommand.stdout.setEncoding('utf8')
-        gitCommand.stdout.pipe(process.stdout)
-        gitCommand.on('close', (code) => {
-          if (code === 0) {
-            resolve()
-            return
-          }
-          // TODO
-          reject(code)
-        })
+    openPR (toRepo, fromFork, title, body = 'This is an automatic PR created with massive-wax!') {
+      // https://developer.github.com/v3/pulls/#create-a-pull-request
+      return githubClient.pulls.create({
+        ...toRepo,
+        ...fromFork,
+        title,
+        body,
+        maintainer_can_modify: true,
+        draft: false
       })
     }
   }
