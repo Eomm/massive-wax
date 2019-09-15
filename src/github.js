@@ -44,8 +44,6 @@ module.exports = function build (authConfig) {
         .catch(reject)
 
       function checkStatus () {
-        console.log(forkData.url)
-
         return githubClient.request(`HEAD ${forkData.url}`)
           .catch(err => {
             if (tentative < maxRetry) {
