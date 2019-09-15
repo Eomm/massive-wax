@@ -28,7 +28,7 @@ module.exports = function factory (logger, args) {
         }
       }
     },
-    onRepoEnd (repo) {
+    onComplete (repo) {
       console.log('The repo ends:', repo)
     }
   }

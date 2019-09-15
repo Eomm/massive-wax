@@ -11,6 +11,7 @@
     "@oclif/command": "^1.5.18",
     "@oclif/config": "^1.13.3",
     "@oclif/plugin-help": "^2.2.1",
+    "@oclif/plugin-not-found": "^1.2.3",
     "@octokit/rest": "^16.28.9",
     "array.prototype.flatmap": "^1.2.1",
     "parse-github-url": "^1.0.2",
@@ -42,16 +43,18 @@
     "commands": "./src/commands",
     "bin": "massive-wax",
     "plugins": [
-      "@oclif/plugin-help"
+      "@oclif/plugin-help",
+      "@oclif/plugin-not-found"
     ]
   },
   "repository": "Eomm/massive-wax",
   "scripts": {
-    "postpack": "rimraf oclif.manifest.json",
     "prepack": "oclif-dev manifest && oclif-dev readme",
+    "postpack": "rimraf oclif.manifest.json",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "test": "tap test/**/*.test.js",
-    "version": "oclif-dev readme && git add README.md"
+    "test": "npm run lint && tap test/**/*.test.js",
+    "prepublish": "npm run readme",
+    "readme": "oclif-dev readme"
   }
 }

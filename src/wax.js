@@ -4,11 +4,10 @@ const path = require('path')
 const fs = require('fs')
 
 module.exports = function waxOn (options) {
-  const opts = Object.assign({
-    pattern: /\.js$|\.json$/i
-  }, options)
+  const opts = Object.assign({}, options)
 
-  const fileFilter = (path) => opts.pattern.test(path)
+  const pattern = new RegExp(opts.pattern)
+  const fileFilter = (path) => pattern.test(path)
 
   return {
     updateSourceCode

@@ -8,8 +8,6 @@ const Github = require('../github')
 const GitDir = require('../git-repo')
 const Wax = require('../wax')
 
-const gkProcess = require('../processor/greenkeeper')
-
 class UpgradeCommand extends Command {
   async run () {
     const { flags, argv } = this.parse(this.constructor)
@@ -18,43 +16,46 @@ class UpgradeCommand extends Command {
     const git = GitDir(flags.cwd)
 
     const repos = utils.parseRepo(flags.repo)
+    const processors = utils.parseProcessor(flags.processor, argv, this.log)
 
     repos.forEach(async repo => {
       let cloneUrl = repo.href
       let clonePath = `${repo.owner}/${repo.repo}`
 
+      let fork = {}
       if (flags.fork) {
         this.log(`Forking ${cloneUrl}`)
-        const resp = await gh.fork(repo)
-        cloneUrl = resp.clone_url
-        clonePath = resp.full_name
+        const forkResponse = await gh.fork(repo)
+        cloneUrl = forkResponse.clone_url
+        clonePath = forkResponse.full_name
         this.log(`Forked ${cloneUrl}`)
+        fork = {
+          owner: forkResponse.owner.login
+        }
       }
 
       clonePath = path.join(flags.cwd, clonePath)
       this.log(`Cloning ${cloneUrl} to ${clonePath}`)
       await git.clone(cloneUrl, clonePath)
 
-      // TODO processors
-      // await wax.updateSourceCode(clonePath, gkProcess(argv, 'tap'))
+      // parallel execution
+      processors.filter(_ => _.onRepo).forEach(_ => _.onRepo(repo))
 
-      // const gitCloned = GitDir(clonePath)
-      // await gitCloned.branch('wax')
-      // await gitCloned.add('./*')
-      // await gitCloned.commit({ message: 'wax in action', noVerify: true })
-      // await gitCloned.push(['-u', 'origin', 'wax'])
+      await Promise.all(processors.map(p => {
+        // TODO inefficient: multiple traversal on the same dir
+        return wax.updateSourceCode(clonePath, p.onFile, p.onComplete)
+      }))
 
-      // const source = {
-      //   head: `${resp.owner.login}:wax`,
-      //   // head: `${resp.name}`,
-      //   base: 'master'
-      // }
-
-      // try {
-      //   await gh.openPR(repo, source, 'chore: greenkeeper ignore tap')
-      // } catch (error) {
-      //   console.log({ error: error.errors })
-      // }
+      const gitCloned = GitDir(clonePath)
+      await gitCloned.branch(flags.branch)
+      await gitCloned.add('./*') // ? sure all?
+      await gitCloned.commit({ message: flags.commit, noVerify: true })
+      await gitCloned.push(['-u', 'origin', flags.branch])
+      const prCoordinates = {
+        head: `${fork.owner || repo.owner}:${flags.branch}`,
+        base: 'master' // destination repo
+      }
+      await gh.openPR(repo, prCoordinates, flags['pr-title'], flags['pr-body'])
     })
   }
 }
@@ -102,6 +103,11 @@ UpgradeCommand.flags = {
     char: 'b',
     description: 'the branch name where apply the changes',
     default: 'wax'
+  }),
+  commit: flags.string({
+    char: 'C',
+    description: 'the commit message',
+    default: 'wax in action'
   }),
   'pr-title': flags.string({
     char: 'T',

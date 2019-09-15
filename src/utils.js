@@ -19,6 +19,22 @@ function parseRepo (reposInput) {
     .map(_ => ({ owner: _.owner, repo: _.name, href: _.href }))
 }
 
+function parseProcessor (processorsInput, args, logger, searchPaths = []) {
+  return processorsInput.map(processorFile => {
+    try {
+      const pLoadFile = require.resolve(processorFile, { paths: [...module.paths, ...searchPaths] })
+      const processor = require(pLoadFile)
+      if (!processor || typeof processor !== 'function') {
+        return processor
+      }
+      return processor(args, logger)
+    } catch (error) {
+      // TODO log or block??
+      return null
+    }
+  }).filter(_ => _ !== null)
+}
+
 function fileToLines (file) {
   try {
     // perdoname madre por mi vida loca
@@ -28,4 +44,7 @@ function fileToLines (file) {
   }
 }
 
-module.exports.parseRepo = parseRepo
+module.exports = {
+  parseRepo,
+  parseProcessor
+}
