@@ -46,7 +46,7 @@ class UpgradeCommand extends Command {
         return wax.updateSourceCode(clonePath, p.onFile, p.onComplete)
       }))
 
-      if (flags['dry-run']) {
+      if (!flags['do-commit']) {
         this.log('Dry run don\'t commit the processed repo')
         return
       }
@@ -56,22 +56,26 @@ class UpgradeCommand extends Command {
       await gitCloned.add('./*') // ? sure all?
       await gitCloned.commit({ message: flags.commit, noVerify: true })
       await gitCloned.push(['-u', 'origin', flags.branch])
-      const prCoordinates = {
-        head: `${fork.owner || repo.owner}:${flags.branch}`,
-        base: 'master' // destination repo
-      }
-      await gh.openPR(repo, prCoordinates, flags['pr-title'], flags['pr-body'])
-    })
-  }
 
-  async catch (err) {
-    this.log(err)
+      if (flags['do-pr']) {
+        const prCoordinates = {
+          head: `${fork.owner || repo.owner}:${flags.branch}`,
+          base: 'master' // destination repo
+        }
+        await gh.openPR(repo, prCoordinates, flags['pr-title'], flags['pr-body'])
+      }
+    })
   }
 }
 
-UpgradeCommand.description = `Describe the command here
+UpgradeCommand.description = `Process the files of many GitHub repositories as you want and open PR with changes!
 ...
-Extra documentation goes here
+This command will:
+- fork the repos in the GH account associated with the --token
+- clone the repos in your local env
+- process all the files of the cloned repos
+- commit the changes in a dedicated branch
+- open a PR to the origin repo
 `
 
 UpgradeCommand.flags = {
@@ -121,17 +125,22 @@ UpgradeCommand.flags = {
   'pr-title': flags.string({
     char: 'T',
     description: 'the title of the PR',
-    required: true
+    default: 'automatic PR'
   }),
   'pr-body': flags.string({
     char: 'B',
     description: 'the body message of the PR',
     default: 'This is an automatic PR created with [massive-wax](https://github.com/Eomm/massive-wax)!'
   }),
-  'dry-run': flags.string({
+  'do-commit': flags.boolean({
     char: 'D',
-    description: 'do not commit and open PR',
-    default: false
+    description: 'commit the changes',
+    default: true
+  }),
+  'do-pr': flags.boolean({
+    char: 'D',
+    description: 'open the PR to forked repo (only if --do-commit is true)',
+    default: true
   })
 }
 
