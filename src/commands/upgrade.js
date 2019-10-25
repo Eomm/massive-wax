@@ -46,6 +46,11 @@ class UpgradeCommand extends Command {
         return wax.updateSourceCode(clonePath, p.onFile, p.onComplete)
       }))
 
+      if (flags['dry-run']) {
+        this.log('Dry run don\'t commit the processed repo')
+        return
+      }
+
       const gitCloned = GitDir(clonePath)
       await gitCloned.branch(flags.branch)
       await gitCloned.add('./*') // ? sure all?
@@ -57,6 +62,10 @@ class UpgradeCommand extends Command {
       }
       await gh.openPR(repo, prCoordinates, flags['pr-title'], flags['pr-body'])
     })
+  }
+
+  async catch (err) {
+    this.log(err)
   }
 }
 
@@ -118,6 +127,11 @@ UpgradeCommand.flags = {
     char: 'B',
     description: 'the body message of the PR',
     default: 'This is an automatic PR created with [massive-wax](https://github.com/Eomm/massive-wax)!'
+  }),
+  'dry-run': flags.string({
+    char: 'D',
+    description: 'do not commit and open PR',
+    default: false
   })
 }
 
