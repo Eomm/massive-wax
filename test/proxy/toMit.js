@@ -2,13 +2,13 @@
 
 const fs = require('fs')
 
-module.exports = function factory (logger, args) {
+module.exports = function factory (args, logger) {
   return {
     onRepo (repo) { },
     onFile (file) {
       if (file.endsWith('LICENSE')) {
+        logger('Updated licence')
         fs.writeFileSync(file, fs.readFileSync('./LICENSE'))
-        return
       }
 
       if (!file.endsWith('package.json')) {

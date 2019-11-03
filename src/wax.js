@@ -3,10 +3,10 @@
 const path = require('path')
 const fs = require('fs')
 
-module.exports = function waxOn (options) {
+module.exports = function waxOn (options, logger) {
   const opts = Object.assign({}, options)
 
-  const pattern = new RegExp(opts.pattern)
+  const pattern = new RegExp(opts.match)
   const fileFilter = (path) => pattern.test(path)
 
   return {
@@ -14,7 +14,7 @@ module.exports = function waxOn (options) {
   }
 
   function updateSourceCode (directory, onFile, onComplete) {
-    console.log('walking', directory)
+    logger(`Walking ${directory}`)
 
     const iter = walkSync(directory, fileFilter)
     const goNext = () => { next(iter.next().value) }

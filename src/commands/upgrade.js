@@ -12,13 +12,13 @@ class UpgradeCommand extends Command {
   async run () {
     const { flags, argv } = this.parse(this.constructor)
     const gh = Github(flags.token)
-    const wax = Wax()
-    const git = GitDir(flags.cwd)
+    const wax = Wax(flags, this.log)
+    const git = GitDir(flags['work-path'])
 
     const repos = utils.parseRepo(flags.repo)
     const processors = utils.parseProcessor(flags.processor, argv, this.log)
 
-    repos.forEach(async repo => {
+    repos.map(async repo => {
       let cloneUrl = repo.href
       let clonePath = `${repo.owner}/${repo.repo}`
 
@@ -34,10 +34,11 @@ class UpgradeCommand extends Command {
         }
       }
 
-      clonePath = path.join(flags.cwd, clonePath)
-      this.log(`Cloning ${cloneUrl} to ${clonePath}`)
-      await git.clone(cloneUrl, clonePath)
-
+      clonePath = path.join(flags['work-path'], clonePath)
+      if (flags.clone) {
+        this.log(`Cloning ${cloneUrl} to ${clonePath}`)
+        await git.clone(cloneUrl, clonePath)
+      }
       // parallel execution
       processors.filter(_ => _.onRepo).forEach(_ => _.onRepo(repo))
 
@@ -46,23 +47,26 @@ class UpgradeCommand extends Command {
         return wax.updateSourceCode(clonePath, p.onFile, p.onComplete)
       }))
 
-      if (!flags['do-commit']) {
+      if (flags.commit === false) {
         this.log('Dry run don\'t commit the processed repo')
         return
       }
 
       const gitCloned = GitDir(clonePath)
-      await gitCloned.branch(flags.branch)
+      // await gitCloned.branch(flags.branch)
       await gitCloned.add('./*') // ? sure all?
-      await gitCloned.commit({ message: flags.commit, noVerify: true })
+      await gitCloned.commit({ message: flags['commit-message'], noVerify: true })
+      this.log(`Commit done for ${repo.repo}`)
       await gitCloned.push(['-u', 'origin', flags.branch])
+      this.log(`Push done for ${repo.repo}`)
 
-      if (flags['do-pr']) {
+      if (flags.pr) {
         const prCoordinates = {
           head: `${fork.owner || repo.owner}:${flags.branch}`,
-          base: 'master' // destination repo
+          base: 'master' // TODO destination repo
         }
-        await gh.openPR(repo, prCoordinates, flags['pr-title'], flags['pr-body'])
+        const data = await gh.openPR(repo, prCoordinates, flags['pr-title'], flags['pr-body'])
+        this.log(`Opened PR: ${data.url}`)
       }
     })
   }
@@ -80,7 +84,7 @@ This command will:
 
 UpgradeCommand.flags = {
   token: flags.string({
-    char: 't',
+    char: 'K',
     description: 'the GitHub token to fork the project and push the changes. You can set it via env named GITHUB_TOKEN',
     env: 'GITHUB_TOKEN',
     required: true
@@ -91,13 +95,8 @@ UpgradeCommand.flags = {
     required: true,
     multiple: true
   }),
-  fork: flags.boolean({
-    char: 'F',
-    description: 'fork the project before cloning. Useful if you don\'t have the write grant',
-    default: false
-  }),
-  cwd: flags.string({
-    char: 'c',
+  'work-path': flags.string({
+    char: 'w',
     description: 'current working directory',
     default: process.cwd()
   }),
@@ -117,13 +116,13 @@ UpgradeCommand.flags = {
     description: 'the branch name where apply the changes',
     default: 'wax'
   }),
-  commit: flags.string({
-    char: 'C',
+  'commit-message': flags.string({
+    char: 'c',
     description: 'the commit message',
     default: 'wax in action'
   }),
   'pr-title': flags.string({
-    char: 'T',
+    char: 't',
     description: 'the title of the PR',
     default: 'automatic PR'
   }),
@@ -132,15 +131,29 @@ UpgradeCommand.flags = {
     description: 'the body message of the PR',
     default: 'This is an automatic PR created with [massive-wax](https://github.com/Eomm/massive-wax)!'
   }),
-  'do-commit': flags.boolean({
-    char: 'D',
-    description: 'commit the changes',
-    default: true
+  fork: flags.boolean({
+    char: 'F',
+    description: 'fork the project before cloning. Useful if you don\'t have the write grant',
+    default: false,
+    allowNo: true
   }),
-  'do-pr': flags.boolean({
-    char: 'D',
-    description: 'open the PR to forked repo (only if --do-commit is true)',
-    default: true
+  clone: flags.boolean({
+    char: 'L',
+    description: 'clone the repo before executing the processors',
+    default: true,
+    allowNo: true
+  }),
+  commit: flags.boolean({
+    char: 'C',
+    description: 'commit the changes',
+    default: true,
+    allowNo: true
+  }),
+  pr: flags.boolean({
+    char: 'R',
+    description: 'open the PR to forked repo',
+    default: true,
+    allowNo: true
   })
 }
 
