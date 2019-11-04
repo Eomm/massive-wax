@@ -11,14 +11,14 @@ const Wax = require('../wax')
 class UpgradeCommand extends Command {
   async run () {
     const { flags, argv } = this.parse(this.constructor)
-    const gh = Github(flags.token)
+    const gh = Github(flags.token, this.log)
     const wax = Wax(flags, this.log)
     const git = GitDir(flags['work-path'])
 
     const repos = utils.parseRepo(flags.repo)
     const processors = utils.parseProcessor(flags.processor, argv, this.log)
 
-    repos.map(async repo => {
+    const operations = repos.map(async repo => {
       let cloneUrl = repo.href
       let clonePath = `${repo.owner}/${repo.repo}`
 
@@ -53,7 +53,7 @@ class UpgradeCommand extends Command {
       }
 
       const gitCloned = GitDir(clonePath)
-      // await gitCloned.branch(flags.branch)
+      await gitCloned.branch(flags.branch)
       await gitCloned.add('./*') // ? sure all?
       await gitCloned.commit({ message: flags['commit-message'], noVerify: true })
       this.log(`Commit done for ${repo.repo}`)
@@ -66,9 +66,10 @@ class UpgradeCommand extends Command {
           base: 'master' // TODO destination repo
         }
         const data = await gh.openPR(repo, prCoordinates, flags['pr-title'], flags['pr-body'])
-        this.log(`Opened PR: ${data.url}`)
+        this.log(`Opened PR: ${data.data.html_url}`)
       }
     })
+    return Promise.all(operations)
   }
 }
 
@@ -86,8 +87,7 @@ UpgradeCommand.flags = {
   token: flags.string({
     char: 'K',
     description: 'the GitHub token to fork the project and push the changes. You can set it via env named GITHUB_TOKEN',
-    env: 'GITHUB_TOKEN',
-    required: true
+    env: 'GITHUB_TOKEN'
   }),
   repo: flags.string({
     char: 'r',

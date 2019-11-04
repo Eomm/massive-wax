@@ -9,3 +9,4 @@ package-lock.json
 dirty-bot/
 *.out
 /Eomm
+/test/asset/response

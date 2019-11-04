@@ -1,7 +1,7 @@
 massive-wax
 ===========
 
-asd
+[] GH Token must have repo > public_repo (to fork and commit)
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/massive-wax.svg)](https://npmjs.org/package/massive-wax)

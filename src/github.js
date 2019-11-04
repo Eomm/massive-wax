@@ -5,7 +5,8 @@ const { promisify } = require('util')
 
 const setTime = promisify(setTimeout)
 
-module.exports = function build (authConfig) {
+/* istanbul ignore file */
+module.exports = function build (authConfig, logger) {
   let auth = authConfig
   if (typeof authConfig === 'string') {
     auth = authConfig
@@ -47,8 +48,8 @@ module.exports = function build (authConfig) {
         return githubClient.request(`HEAD ${forkData.url}`)
           .catch(err => {
             if (tentative < maxRetry) {
-              console.log('Retry', tentative)
               tentative++
+              logger(`Waiting fork.. ${tentative}`)
               return setTime(retryAfter)
                 .then(() => checkStatus())
             }
