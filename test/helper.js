@@ -46,9 +46,22 @@ module.exports.buildCommand = (events = {}) => {
     }
   }
 
+  const waxMock = function factory () {
+    return {
+      updateSourceCode: (directory, onFile, onComplete) => {
+        if (!onComplete) {
+          return Promise.resolve()
+        } else {
+          onComplete()
+        }
+      }
+    }
+  }
+
   const cmd = proxyquire('../src/commands/upgrade', {
     '../github': gitHub,
-    '../git-repo': gitDir
+    '../git-repo': gitDir,
+    '../wax': waxMock
   })
   return cmd
 }

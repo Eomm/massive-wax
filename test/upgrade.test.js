@@ -1,9 +1,11 @@
 'use strict'
 
-const path = require('path')
+const fs = require('fs')
 const { test } = require('tap')
+const rimraf = require('rimraf')
 const helper = require('./helper')
 const cmd = helper.buildCommand()
+const cmdReal = require('../src/commands/upgrade')
 
 test('Mandatory params', t => {
   t.plan(2)
@@ -21,12 +23,40 @@ test('Run', t => {
   cmd.run([
     '-r', 'https://github.com/pkgjs/nv',
     '-K', '123-GITHUB-TOKEN-123',
-    '-p', './proxy/toMit.js'
+    '-p', './test/proxy/toMit.js'
   ])
     .then(() => { t.pass() })
     .catch(err => {
       t.error(err)
       t.fail('it must not fail')
+    })
+})
+
+test('Bad processor', t => {
+  t.plan(2)
+  cmd.run([
+    '-r', 'https://github.com/pkgjs/nv',
+    '-K', '123-GITHUB-TOKEN-123',
+    '-p', './test/proxy/bad.js'
+  ])
+    .then(() => { t.fail('must exit with an error') })
+    .catch(err => {
+      t.equals(err.message, 'Processor ./test/proxy/bad.js must be a function!')
+      t.pass('it must throw an error')
+    })
+})
+
+test('Bad factory processor', t => {
+  t.plan(2)
+  cmd.run([
+    '-r', 'https://github.com/pkgjs/nv',
+    '-K', '123-GITHUB-TOKEN-123',
+    '-p', './test/proxy/bad-factory.js'
+  ])
+    .then(() => { t.fail('must exit with an error') })
+    .catch(err => {
+      t.equals(err.message, 'Processor ./test/proxy/bad-factory.js throws an error on build')
+      t.pass('it must throw an error')
     })
 })
 
@@ -43,7 +73,7 @@ test('Fork Clone Commit PR', t => {
     },
     async onClone (ghUrl, localPath) {
       t.equals(ghUrl, 'clone_url')
-      t.equals(localPath, path.join(process.cwd(), 'full_name'))
+      t.equals(localPath, 'full_name')
     },
     async onBranch (branchName) {
       t.equals(branchName, 'branch-name')
@@ -78,7 +108,7 @@ test('Fork Clone Commit PR', t => {
     '-t', 'PR title',
     '-B', 'PR body',
     '-F', // turn on fork
-    '-p', './proxy/toMit.js'
+    '-p', './test/proxy/toMit.js'
   ])
     .then(() => { t.pass('done') })
     .catch(t.error)
@@ -98,7 +128,7 @@ test('Clone Commit PR', t => {
     '-t', 'PR title',
     '-B', 'PR body',
     '--no-fork',
-    '-p', './proxy/toMit.js'
+    '-p', './test/proxy/toMit.js'
   ])
     .then(() => { t.pass('done') })
     .catch(t.error)
@@ -119,7 +149,7 @@ test('Commit PR', t => {
     '-t', 'PR title',
     '-B', 'PR body',
     '--no-clone',
-    '-p', './proxy/toMit.js'
+    '-p', './test/proxy/toMit.js'
   ])
     .then(() => { t.pass('done') })
     .catch(t.error)
@@ -139,7 +169,27 @@ test('No PR when no commit', t => {
     '-r', 'https://github.com/pkgjs/support',
     '-m', 'json$',
     '--no-commit',
-    '-p', './proxy/toMit.js'
+    '-p', './test/proxy/toMit.js'
+  ])
+    .then(() => { t.pass('done') })
+    .catch(t.error)
+})
+
+test('Commit without PR', t => {
+  t.plan(5)
+  const cmd = helper.buildCommand({
+    async onBranch (branchName) { t.pass('it must branch the repo') },
+    async onAdd (fileFilter) { t.pass('it must add the repo') },
+    async onCommit ({ message }) { t.pass('it must commit the repo') },
+    async onPush ([_, remote, branchName]) { t.pass('it must push the repo') },
+    async onPR (repo, to, title, body) { t.fail('it must not PR the repo') }
+  })
+  cmd.run([
+    '-K', '123-GITHUB-TOKEN-123',
+    '-r', 'https://github.com/pkgjs/support',
+    '-m', 'json$',
+    '--no-pr',
+    '-p', './test/proxy/toMit.js'
   ])
     .then(() => { t.pass('done') })
     .catch(t.error)
@@ -160,7 +210,7 @@ test('Error on fork', t => {
     '-t', 'PR title',
     '-B', 'PR body',
     '-F',
-    '-p', './proxy/toMit.js'
+    '-p', './test/proxy/toMit.js'
   ])
     .then(() => { t.fail('must exit with an error') })
     .catch(err => {
@@ -183,7 +233,7 @@ test('Error on clone', t => {
     '-c', 'commit-message',
     '-t', 'PR title',
     '-B', 'PR body',
-    '-p', './proxy/toMit.js'
+    '-p', './test/proxy/toMit.js'
   ])
     .then(() => { t.fail('must exit with an error') })
     .catch(err => {
@@ -206,7 +256,7 @@ test('Error on commit', t => {
     '-c', 'commit-message',
     '-t', 'PR title',
     '-B', 'PR body',
-    '-p', './proxy/toMit.js'
+    '-p', './test/proxy/toMit.js'
   ])
     .then(() => { t.fail('must exit with an error') })
     .catch(err => {
@@ -229,11 +279,55 @@ test('Error on PR', t => {
     '-c', 'commit-message',
     '-t', 'PR title',
     '-B', 'PR body',
-    '-p', './proxy/toMit.js'
+    '-p', './test/proxy/toMit.js'
   ])
     .then(() => { t.fail('must exit with an error') })
     .catch(err => {
       t.pass('it must throw an error')
       t.equals(err.message, theError.message)
     })
+})
+
+test('Do it for real', { timeout: 120000 }, t => {
+  t.plan(3)
+  const cwd = './clone-path/'
+  rimraf(cwd, err => {
+    t.error(err)
+    fs.mkdir(cwd, err => {
+      t.error(err)
+      cmdReal.run([
+        '-w', cwd,
+        '-r', 'https://github.com/Eomm/storie',
+        '-m', 'md$',
+        '--no-fork',
+        '--no-commit',
+        '--no-pr',
+        '-p', './test/proxy/toMit.js'
+      ])
+        .then(() => { t.pass('done') })
+        .catch(t.error)
+    })
+  })
+})
+
+test('Do it for coverage', { timeout: 120000 }, t => {
+  t.plan(3)
+  const cwd = './clone-path/'
+  rimraf(cwd, err => {
+    t.error(err)
+    fs.mkdir(cwd, err => {
+      t.error(err)
+      cmdReal.run([
+        '-w', cwd,
+        '-r', 'https://github.com/Eomm/storie',
+        '-m', 'md$',
+        '--no-fork',
+        '--no-commit',
+        '--no-pr',
+        '-p', './test/proxy/toMit-two.js'
+      ])
+        .then(() => { t.pass('done') })
+        .catch(t.error)
+    })
+  })
 })

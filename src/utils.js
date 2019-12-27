@@ -2,6 +2,7 @@
 
 const os = require('os')
 const fs = require('fs')
+const path = require('path')
 const parseGitUrl = require('parse-github-url')
 const flatMap = require('array.prototype.flatmap')
 flatMap.shim()
@@ -19,18 +20,17 @@ function parseRepo (reposInput) {
     .map(_ => ({ owner: _.owner, repo: _.name, href: _.href }))
 }
 
-function parseProcessor (processorsInput, args, logger, searchPaths = []) {
+function parseProcessor (processorsInput, args, logger) {
   return processorsInput.map(processorFile => {
+    const pLoadFile = path.resolve(processorFile)
+    const processor = require(pLoadFile)
+    if (!processor || typeof processor !== 'function') {
+      throw new Error(`Processor ${processorFile} must be a function!`)
+    }
     try {
-      const pLoadFile = require.resolve(processorFile, { paths: [...module.paths, ...searchPaths] })
-      const processor = require(pLoadFile)
-      if (!processor || typeof processor !== 'function') {
-        return processor
-      }
       return processor(args, logger)
     } catch (error) {
-      // TODO log or block??
-      return null
+      throw new Error(`Processor ${processorFile} throws an error on build`, error)
     }
   }).filter(_ => _ !== null)
 }

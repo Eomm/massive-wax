@@ -34,11 +34,12 @@ class UpgradeCommand extends Command {
         }
       }
 
-      clonePath = path.join(flags['work-path'], clonePath)
       if (flags.clone) {
         this.log(`Cloning ${cloneUrl} to ${clonePath}`)
         await git.clone(cloneUrl, clonePath)
       }
+      clonePath = path.join(flags['work-path'], clonePath)
+
       // parallel execution
       processors.filter(_ => _.onRepo).forEach(_ => _.onRepo(repo))
 

@@ -2,9 +2,10 @@
 
 const fs = require('fs')
 
+// ONLY ON FILE HOOK
+
 module.exports = function factory (args, logger) {
   return {
-    onRepo (repo) { },
     onFile (file) {
       logger('processing file......', file)
 
@@ -22,9 +23,6 @@ module.exports = function factory (args, logger) {
       const packageJson = require(file)
       packageJson.license = 'MIT'
       fs.writeFileSync(file, JSON.stringify(packageJson, null, 2))
-    },
-    onComplete (repo) {
-      logger('completed processor')
     }
   }
 }
