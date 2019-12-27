@@ -48,7 +48,7 @@ class UpgradeCommand extends Command {
       }))
 
       if (flags.commit === false) {
-        this.log('Dry run don\'t commit the processed repo')
+        this.log('Dry run: don\'t commit the processed repo')
         return
       }
 
