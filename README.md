@@ -35,7 +35,7 @@ $ npm install -g massive-wax
 $ massive-wax COMMAND
 running command...
 $ massive-wax (-v|--version|version)
-massive-wax/0.0.0 win32-x64 node-v10.11.0
+massive-wax/1.0.0 win32-x64 node-v10.11.0
 $ massive-wax --help [COMMAND]
 USAGE
   $ massive-wax COMMAND
@@ -93,15 +93,16 @@ OPTIONS
 
   -m, --match=match                    [default: .js$|.json$] the files that match this pattern will be processed
 
-  -p, --processor=processor            (required) the processor(s) that will modify the cloned repo. It can be a file or
-                                       a global package
+  -p, --processor=processor            (required) the processor(s) that will modify the cloned repo. It must be a node
+                                       module
 
   -r, --repo=repo                      (required) the URL repo to upgrade. If it is a file, each line of the file must
                                        be a repo URL
 
   -t, --pr-title=pr-title              [default: automatic PR] the title of the PR
 
-  -w, --work-path=work-path            [default: C:\Users\behem\workspace\massive-wax] current working directory
+  -w, --work-path=work-path            [default: C:\Users\behem\workspace\massive-wax] current working directory: where
+                                       cloning the repos
 
 DESCRIPTION
   ...
@@ -110,10 +111,17 @@ DESCRIPTION
   - clone the repos in your local env
   - process all the files of the cloned repos
   - commit the changes in a dedicated branch
-  - open a PR to the origin repo
+  - open a PR to the master branch in the origin repo
+
+  All these steps are optionals.
+
+EXAMPLES
+  Change all the LICENCE file of your org
+    $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -b licensebranch -r 
+  repo-list.txt
 ```
 
-_See code: [src\commands\upgrade.js](https://github.com/Eomm/massive-wax/blob/v0.0.0/src\commands\upgrade.js)_
+_See code: [src\commands\upgrade.js](https://github.com/Eomm/massive-wax/blob/v1.0.0/src\commands\upgrade.js)_
 <!-- commandsstop -->
 
 ## Processor

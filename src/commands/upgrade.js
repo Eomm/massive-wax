@@ -162,7 +162,7 @@ UpgradeCommand.flags = {
 
 UpgradeCommand.examples = [
   'Change all the LICENCE file of your org',
-  " $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' --match 'json$' -c='chore: changed license' -b new-license -r repo-list.txt"
+  " $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -b licensebranch -r repo-list.txt"
 ]
 
 module.exports = UpgradeCommand
