@@ -81,7 +81,9 @@ This command will:
 - clone the repos in your local env
 - process all the files of the cloned repos
 - commit the changes in a dedicated branch
-- open a PR to the origin repo
+- open a PR to the master branch in the origin repo
+
+All these steps are optionals.
 `
 
 UpgradeCommand.flags = {
@@ -98,7 +100,7 @@ UpgradeCommand.flags = {
   }),
   'work-path': flags.string({
     char: 'w',
-    description: 'current working directory',
+    description: 'current working directory: where cloning the repos',
     default: process.cwd()
   }),
   match: flags.string({
@@ -108,7 +110,7 @@ UpgradeCommand.flags = {
   }),
   processor: flags.string({
     char: 'p',
-    description: 'the processor(s) that will modify the cloned repo. It can be a file or a global package',
+    description: 'the processor(s) that will modify the cloned repo. It must be a node module',
     required: true,
     multiple: true
   }),
@@ -157,5 +159,10 @@ UpgradeCommand.flags = {
     allowNo: true
   })
 }
+
+UpgradeCommand.examples = [
+  'Change all the LICENCE file of your org',
+  " $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' --match 'json$' -c='chore: changed license' -b new-license -r repo-list.txt"
+]
 
 module.exports = UpgradeCommand

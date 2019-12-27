@@ -35,10 +35,15 @@ module.exports = function waxOn (options, logger) {
         }
         return
       }
-      const out = onFile(value)
-      if (out && typeof out.then === 'function') {
-        out.then(goNext).catch(goNext)
-        return
+      try {
+        const out = onFile(value)
+        if (out && typeof out.then === 'function') {
+          out.then(goNext).catch(goNext)
+          return
+        }
+      } catch (error) {
+        // ouch.. user's processor failed to process a file
+        logger(`Failed to process ${value}`, error)
       }
       goNext()
     }

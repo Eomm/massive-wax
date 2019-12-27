@@ -1,7 +1,7 @@
 {
   "name": "massive-wax",
-  "description": "asd",
-  "version": "0.0.0",
+  "description": "It does repetitive jobs on GitHub repos",
+  "version": "1.0.0",
   "author": "Manuel Spigolon @Eomm",
   "bin": {
     "massive-wax": "./bin/run"
