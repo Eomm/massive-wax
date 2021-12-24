@@ -64,7 +64,7 @@ class UpgradeCommand extends Command {
       if (flags.pr) {
         const prCoordinates = {
           head: `${fork.owner || repo.owner}:${flags.branch}`,
-          base: 'master' // TODO destination repo
+          base: flags.main_branch
         }
         const data = await gh.openPR(repo, prCoordinates, flags['pr-title'], flags['pr-body'])
         this.log(`Opened PR: ${data.data.html_url}`)
@@ -119,6 +119,11 @@ UpgradeCommand.flags = {
     description: 'the branch name where apply the changes',
     default: 'wax'
   }),
+  main_branch: flags.string({
+    char: 'M',
+    description: 'the main branch in the origin repo',
+    default: 'main'
+  }),
   'commit-message': flags.string({
     char: 'c',
     description: 'the commit message',
@@ -162,7 +167,7 @@ UpgradeCommand.flags = {
 
 UpgradeCommand.examples = [
   'Change all the LICENCE file of your org',
-  " $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -b licensebranch -r repo-list.txt"
+  " $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -M main -b licensebranch -r repo-list.txt"
 ]
 
 module.exports = UpgradeCommand
