@@ -89,6 +89,8 @@ OPTIONS
 
   -b, --branch=branch                  [default: wax] the branch name where apply the changes
 
+  -M, --main-branch=main-branch        [default: main] the main branch in the origin repo
+
   -c, --commit-message=commit-message  [default: wax in action] the commit message
 
   -m, --match=match                    [default: .js$|.json$] the files that match this pattern will be processed
@@ -111,13 +113,13 @@ DESCRIPTION
   - clone the repos in your local env
   - process all the files of the cloned repos
   - commit the changes in a dedicated branch
-  - open a PR to the master branch in the origin repo
+  - open a PR to the main branch in the origin repo
 
   All these steps are optionals.
 
 EXAMPLES
   Change all the LICENCE file of your org
-    $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -b licensebranch -r 
+    $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -M main -b licensebranch -r 
   repo-list.txt
 ```
 
