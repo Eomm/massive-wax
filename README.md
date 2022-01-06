@@ -35,7 +35,7 @@ $ npm install -g massive-wax
 $ massive-wax COMMAND
 running command...
 $ massive-wax (-v|--version|version)
-massive-wax/1.0.0 darwin-arm64 node-v16.13.0
+massive-wax/1.1.0 linux-x64 node-v10.24.1
 $ massive-wax --help [COMMAND]
 USAGE
   $ massive-wax COMMAND
@@ -103,8 +103,8 @@ OPTIONS
 
   -t, --pr-title=pr-title              [default: automatic PR] the title of the PR
 
-  -w, --work-path=work-path            [default: /Users/mspigolon/workspace/massive-wax] current working
-                                       directory: where cloning the repos
+  -w, --work-path=work-path            [default: /home/runner/work/massive-wax/massive-wax] current working directory:
+                                       where cloning the repos
 
 DESCRIPTION
   ...
@@ -123,7 +123,7 @@ EXAMPLES
   licensebranch -r repo-list.txt
 ```
 
-_See code: [src/commands/upgrade.js](https://github.com/Eomm/massive-wax/blob/v1.0.0/src/commands/upgrade.js)_
+_See code: [src/commands/upgrade.js](https://github.com/Eomm/massive-wax/blob/v1.1.0/src/commands/upgrade.js)_
 <!-- commandsstop -->
 
 ## Processor
