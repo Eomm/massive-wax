@@ -92,7 +92,7 @@ test('Fork Clone Commit PR', t => {
       t.deepEquals(repo, { owner: 'pkgjs', repo: 'support', href: 'https://github.com/pkgjs/support' })
       t.deepEquals(to, {
         head: 'lolologin:branch-name',
-        base: 'master'
+        base: 'main-branch-name'
       })
       t.equals(title, 'PR title')
       t.equals(body, 'PR body')
@@ -104,6 +104,7 @@ test('Fork Clone Commit PR', t => {
     '-r', 'https://github.com/pkgjs/support',
     '-m', 'json$',
     '-b', 'branch-name',
+    '-O', 'main-branch-name',
     '-c', 'commit-message',
     '-t', 'PR title',
     '-B', 'PR body',
