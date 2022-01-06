@@ -35,7 +35,7 @@ $ npm install -g massive-wax
 $ massive-wax COMMAND
 running command...
 $ massive-wax (-v|--version|version)
-massive-wax/1.0.0 win32-x64 node-v10.11.0
+massive-wax/1.0.0 darwin-arm64 node-v16.13.0
 $ massive-wax --help [COMMAND]
 USAGE
   $ massive-wax COMMAND
@@ -62,7 +62,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src\commands\help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
 
 ## `massive-wax upgrade`
 
@@ -85,11 +85,11 @@ OPTIONS
 
   -L, --[no-]clone                     clone the repo before executing the processors
 
+  -O, --pr-origin=pr-origin            [default: master] the main branch in the origin repo
+
   -R, --[no-]pr                        open the PR to forked repo
 
   -b, --branch=branch                  [default: wax] the branch name where apply the changes
-
-  -O, --pr-origin=master        [default: master] the target PR branch name in the origin repository
 
   -c, --commit-message=commit-message  [default: wax in action] the commit message
 
@@ -103,8 +103,8 @@ OPTIONS
 
   -t, --pr-title=pr-title              [default: automatic PR] the title of the PR
 
-  -w, --work-path=work-path            [default: C:\Users\behem\workspace\massive-wax] current working directory: where
-                                       cloning the repos
+  -w, --work-path=work-path            [default: /Users/mspigolon/workspace/massive-wax] current working
+                                       directory: where cloning the repos
 
 DESCRIPTION
   ...
@@ -113,17 +113,17 @@ DESCRIPTION
   - clone the repos in your local env
   - process all the files of the cloned repos
   - commit the changes in a dedicated branch
-  - open a PR to the `pr-origin` branch in the origin repo
+  - open a PR to the `--pr-origin` branch in the origin repo
 
   All these steps are optionals.
 
 EXAMPLES
   Change all the LICENCE file of your org
-    $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -O main -b licensebranch -r 
-  repo-list.txt
+   $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -O main -b 
+  licensebranch -r repo-list.txt
 ```
 
-_See code: [src\commands\upgrade.js](https://github.com/Eomm/massive-wax/blob/v1.0.0/src\commands\upgrade.js)_
+_See code: [src/commands/upgrade.js](https://github.com/Eomm/massive-wax/blob/v1.0.0/src/commands/upgrade.js)_
 <!-- commandsstop -->
 
 ## Processor

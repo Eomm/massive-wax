@@ -81,7 +81,7 @@ This command will:
 - clone the repos in your local env
 - process all the files of the cloned repos
 - commit the changes in a dedicated branch
-- open a PR to the master branch in the origin repo
+- open a PR to the \`--pr-origin\` branch in the origin repo
 
 All these steps are optionals.
 `
@@ -120,7 +120,7 @@ UpgradeCommand.flags = {
     default: 'wax'
   }),
   'pr-origin': flags.string({
-    char: 'M',
+    char: 'O',
     description: 'the main branch in the origin repo',
     default: 'master'
   }),
