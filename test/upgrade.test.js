@@ -104,7 +104,7 @@ test('Fork Clone Commit PR', t => {
     '-r', 'https://github.com/pkgjs/support',
     '-m', 'json$',
     '-b', 'branch-name',
-    '-M', 'main-branch-name',
+    '-O', 'main-branch-name',
     '-c', 'commit-message',
     '-t', 'PR title',
     '-B', 'PR body',
