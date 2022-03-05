@@ -13,12 +13,13 @@ module.exports = function factory (args, logger) {
         fs.writeFileSync(file, fs.readFileSync('./LICENSE'))
       }
 
-      if (!file.endsWith('package.json')) {
+      if (!file.endsWith('README.md')) {
         return new Promise(resolve => {
           setTimeout(resolve, 200)
         })
       }
 
+      // we want to let it throws to test the error handling
       const packageJson = require(file)
       packageJson.license = 'MIT'
       fs.writeFileSync(file, JSON.stringify(packageJson, null, 2))

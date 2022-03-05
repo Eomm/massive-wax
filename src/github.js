@@ -1,6 +1,6 @@
 'use strict'
 
-const Octokit = require('@octokit/rest')
+const { Octokit } = require('@octokit/rest')
 const { promisify } = require('util')
 
 const setTime = promisify(setTimeout)
