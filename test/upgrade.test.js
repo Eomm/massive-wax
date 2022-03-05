@@ -12,7 +12,7 @@ test('Mandatory params', t => {
   cmd.run([])
     .then(() => { t.fail() })
     .catch(err => {
-      t.like(err.message, 'Missing required flag')
+      t.match(err.message, 'Missing required flag')
       t.ok(err, 'should throw for mandatory params')
     })
 })

@@ -13,7 +13,7 @@ module.exports = function factory (args, logger) {
         fs.writeFileSync(file, fs.readFileSync('./LICENSE'))
       }
 
-      if (!file.endsWith('README.md')) {
+      if (!file.endsWith('package.json')) {
         return new Promise(resolve => {
           setTimeout(resolve, 200)
         })
