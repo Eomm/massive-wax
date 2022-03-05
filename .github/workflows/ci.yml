@@ -6,8 +6,9 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 8
-          - 10
+          - 12
+          - 14
+          - 16
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -23,7 +24,7 @@ jobs:
       pull-requests: write
       contents: write
     steps:
-      - uses: fastify/github-action-merge-dependabot@main
+      - uses: fastify/github-action-merge-dependabot@3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           target: minor
