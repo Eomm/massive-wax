@@ -64,7 +64,7 @@ test('Fork Clone Commit PR', t => {
   t.plan(13)
   const cmd = helper.buildCommand({
     async onFork (ghRepo) {
-      t.deepEquals(ghRepo, { owner: 'pkgjs', repo: 'support', href: 'https://github.com/pkgjs/support' })
+      t.same(ghRepo, { owner: 'pkgjs', repo: 'support', href: 'https://github.com/pkgjs/support' })
       return {
         clone_url: 'clone_url',
         full_name: 'full_name',
@@ -89,8 +89,8 @@ test('Fork Clone Commit PR', t => {
       t.equals(branchName, 'branch-name')
     },
     async onPR (repo, to, title, body) {
-      t.deepEquals(repo, { owner: 'pkgjs', repo: 'support', href: 'https://github.com/pkgjs/support' })
-      t.deepEquals(to, {
+      t.same(repo, { owner: 'pkgjs', repo: 'support', href: 'https://github.com/pkgjs/support' })
+      t.same(to, {
         head: 'lolologin:branch-name',
         base: 'main-branch-name'
       })
