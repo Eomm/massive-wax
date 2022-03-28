@@ -34,8 +34,8 @@ Example?
 $ npm install -g massive-wax
 $ massive-wax COMMAND
 running command...
-$ massive-wax (-v|--version|version)
-massive-wax/1.1.0 linux-x64 node-v10.24.1
+$ massive-wax (--version)
+massive-wax/1.1.0 darwin-arm64 node-v16.13.0
 $ massive-wax --help [COMMAND]
 USAGE
   $ massive-wax COMMAND
@@ -49,78 +49,76 @@ USAGE
 
 ## `massive-wax help [COMMAND]`
 
-display help for massive-wax
+Display help for massive-wax.
 
 ```
 USAGE
-  $ massive-wax help [COMMAND]
+  $ massive-wax help [COMMAND] [-n]
 
 ARGUMENTS
-  COMMAND  command to show help for
+  COMMAND  Command to show help for.
 
-OPTIONS
-  --all  see all commands in CLI
+FLAGS
+  -n, --nested-commands  Include all nested commands in the output.
+
+DESCRIPTION
+  Display help for massive-wax.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.12/src/commands/help.ts)_
 
 ## `massive-wax upgrade`
 
-Process the files of many GitHub repositories as you want and open PR with changes!
+Process the files of many GitHub repositories as you want and open PR within the changes!
 
 ```
 USAGE
-  $ massive-wax upgrade
+  $ massive-wax upgrade -r <value> -p <value> [-K <value>] [-w <value>] [-m <value>] [-b <value>] [-O
+    <value>] [-c <value>] [-t <value>] [-B <value>] [-F] [-L] [-C] [-R]
 
-OPTIONS
-  -B, --pr-body=pr-body                [default: This is an automatic PR created with
-                                       [massive-wax](https://github.com/Eomm/massive-wax)!] the body message of the PR
-
-  -C, --[no-]commit                    commit the changes
-
-  -F, --[no-]fork                      fork the project before cloning. Useful if you don't have the write grant
-
-  -K, --token=token                    the GitHub token to fork the project and push the changes. You can set it via env
-                                       named GITHUB_TOKEN
-
-  -L, --[no-]clone                     clone the repo before executing the processors
-
-  -O, --pr-origin=pr-origin            [default: master] the main branch in the origin repo
-
-  -R, --[no-]pr                        open the PR to forked repo
-
-  -b, --branch=branch                  [default: wax] the branch name where apply the changes
-
-  -c, --commit-message=commit-message  [default: wax in action] the commit message
-
-  -m, --match=match                    [default: .js$|.json$] the files that match this pattern will be processed
-
-  -p, --processor=processor            (required) the processor(s) that will modify the cloned repo. It must be a node
-                                       module
-
-  -r, --repo=repo                      (required) the URL repo to upgrade. If it is a file, each line of the file must
-                                       be a repo URL
-
-  -t, --pr-title=pr-title              [default: automatic PR] the title of the PR
-
-  -w, --work-path=work-path            [default: /home/runner/work/massive-wax/massive-wax] current working directory:
-                                       where cloning the repos
+FLAGS
+  -B, --pr-body=<value>         [default: This is an automatic PR created with
+                                [massive-wax](https://github.com/Eomm/massive-wax)!] the body message of the PR
+  -C, --[no-]commit             commit the changes
+  -F, --[no-]fork               fork the project before cloning. Useful if you don't have the write grant
+  -K, --token=<value>           the GitHub token to fork the project and push the changes. You can set it via env named
+                                GITHUB_TOKEN
+  -L, --[no-]clone              clone the repo before executing the processors
+  -O, --pr-origin=<value>       [default: master] the main branch in the origin repo
+  -R, --[no-]pr                 open the PR to forked repo
+  -b, --branch=<value>          [default: wax] the branch name where apply the changes
+  -c, --commit-message=<value>  [default: wax in action] the commit message
+  -m, --match=<value>           [default: .js$|.json$] the files that match this pattern will be processed
+  -p, --processor=<value>...    (required) the processor(s) that will modify the cloned repo. It must be a node module
+  -r, --repo=<value>...         (required) the URL repo to upgrade. If it is a file, each line of the file must be a
+                                repo URL
+  -t, --pr-title=<value>        [default: automatic PR] the title of the PR
+  -w, --work-path=<value>       [default: /Users/mspigolon/workspace/_experiments/massive-wax] current working
+                                directory: where cloning the repos
 
 DESCRIPTION
+  Process the files of many GitHub repositories as you want and open PR within the changes!
+
   ...
+
   This command will:
-  - fork the repos in the GH account associated with the --token
-  - clone the repos in your local env
-  - process all the files of the cloned repos
+
+  - fork the repository in the GH account associated with the --token arg
+
+  - clone the repository in your local env
+
+  - process all the cloned repository's files
+
   - commit the changes in a dedicated branch
-  - open a PR to the `--pr-origin` branch in the origin repo
+
+  - open a PR to the `--pr-origin` branch in the origin repository
 
   All these steps are optionals.
 
 EXAMPLES
-  Change all the LICENCE file of your org
-   $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -O main -b 
-  licensebranch -r repo-list.txt
+  Edit all your GitHub Organization's LICENCE files
+
+   $ upgrade -K GITHUB-TOKEN --fork -p='./toMit.js' -t='Changed license' -c='chore changed license' -O main -b licensebranch -r repo-list.txt
 ```
 
 _See code: [src/commands/upgrade.js](https://github.com/Eomm/massive-wax/blob/v1.1.0/src/commands/upgrade.js)_
