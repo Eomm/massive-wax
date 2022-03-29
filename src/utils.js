@@ -4,8 +4,6 @@ const os = require('os')
 const fs = require('fs')
 const path = require('path')
 const parseGitUrl = require('parse-github-url')
-const flatMap = require('array.prototype.flatmap')
-flatMap.shim()
 
 function parseRepo (reposInput) {
   return reposInput.map(parseGitUrl)

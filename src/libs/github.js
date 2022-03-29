@@ -1,9 +1,7 @@
 'use strict'
 
 const { Octokit } = require('@octokit/rest')
-const { promisify } = require('util')
-
-const setTime = promisify(setTimeout)
+const pRetry = require('p-retry')
 
 /* istanbul ignore file */
 module.exports = function build (authConfig, logger) {
@@ -14,11 +12,15 @@ module.exports = function build (authConfig, logger) {
 
   const githubClient = new Octokit({ auth })
 
+  // githubClient.rest.rateLimit.get()
+
   return {
     async fork (repo) {
       const resp = await githubClient.repos.createFork(repo)
       // TODO manage response
       return waitFork(resp.data)
+
+      // todo è allineata con il repository origine nel caso sia gia forkato??
     },
     openPR (toRepo, fromFork, title, body = 'This is an automatic PR created with massive-wax!') {
       // https://developer.github.com/v3/pulls/#create-a-pull-request
@@ -34,28 +36,11 @@ module.exports = function build (authConfig, logger) {
   }
 
   function waitFork (forkData) {
-    const maxRetry = 5
-    const retryAfter = 1000
-
-    return new Promise((resolve, reject) => {
-      let tentative = 0
-
-      checkStatus()
-        .then(() => resolve(forkData))
-        .catch(reject)
-
-      function checkStatus () {
-        return githubClient.request(`HEAD ${forkData.url}`)
-          .catch(err => {
-            if (tentative < maxRetry) {
-              tentative++
-              logger(`Waiting fork.. ${tentative}`)
-              return setTime(retryAfter)
-                .then(() => checkStatus())
-            }
-            throw err
-          })
-      }
-    })
+    return pRetry(async () => {
+      await githubClient.request(`HEAD ${forkData.url}`)
+      return forkData
+    },
+    { retries: 5 }
+    )
   }
 }

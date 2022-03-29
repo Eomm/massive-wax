@@ -2,20 +2,29 @@
 
 const { Command } = require('@oclif/core')
 const path = require('path')
+const pMap = require('p-map')
 
 const flags = require('../core/upgrade/flags')
 const docs = require('../core/upgrade/docs')
-const utils = require('../utils')
-const Github = require('../github')
+
+const Github = require('../libs/github')
 const GitDir = require('../git-repo')
 const Wax = require('../wax')
+
+const utils = require('../utils')
 
 class UpgradeCommand extends Command {
   async run () {
     const { flags, argv } = await this.parse(this.constructor)
     console.log(flags)
+
+    // 1. connessione a github
+
     const gh = Github(flags.token, this.log)
+
     const wax = Wax(flags, this.log)
+
+    // eliminare simple git
     const git = GitDir(flags['work-path'])
 
     const repos = utils.parseRepo(flags.repo)
