@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 10
-      - uses: nearform/optic-release-automation-action@v2
+      - uses: nearform/optic-release-automation-action@v3
         with:
           github-token: ${{ secrets.github_token }}
           npm-token: ${{ secrets.NPM_TOKEN }}
