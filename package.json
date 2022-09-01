@@ -15,7 +15,7 @@
     "@octokit/rest": "^16.36.0",
     "array.prototype.flatmap": "^1.2.3",
     "parse-github-url": "^1.0.2",
-    "simple-git": "^1.126.0"
+    "simple-git": "^3.13.0"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",
